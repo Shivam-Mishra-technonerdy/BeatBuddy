@@ -1,40 +1,30 @@
 import express from 'express';
-import dotenv from 'dotenv';
-import pool from './db.js';
-
-// 1. Initialize environment variables configuration
-dotenv.config();
+import prisma from './db.js'; // Import our single, secure Prisma instance
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// 2. Middleware: Enables our server to read JSON payloads sent by a client
 app.use(express.json());
 
-// 2. Health Route: Uses your async/await logic to test the database link!
-app.get('/api/health', async (req, res) => {
+// 1. Core Industry-Standard Endpoint: Fetches all tracks from the cloud
+app.get('/api/songs', async (req, res) => {
   try {
-    // Borrow an open line from our pool and ask PostgreSQL for its current time stamp
-    const result = await pool.query('SELECT NOW();');
+    // Uses our generated engine to pull all rows out of the songs table
+    const allSongs = await prisma.songs.findMany();
     
-    // If the network request succeeds, send back a multi-layer success payload
-    res.json({ 
-      status: "Healthy", 
-      message: "BeatBuddy API Server is live! 🎧",
-      database: "Connected successfully! 🔌",
-      singaporeCloudTime: result.rows[0].now // Extracts the actual time from the Neon server
-    });
+    // Send back the raw array of tracks inside a clean JSON packet
+    res.json(allSongs);
   } catch (error) {
-    // Security catch: If the database password or connection fails, log it here
-    console.error("❌ Database connection failure:", error);
-    res.status(500).json({ 
-      status: "Error", 
-      message: "Server is running, but cloud database connection failed." 
-    });
+    console.error("❌ Prisma fetch operation failed:", error);
+    res.status(500).json({ error: "Internal server error fetching songs data." });
   }
 });
 
-// 4. Start the server engine and tell it to listen to our port
+// 2. Health check route remains fully active
+app.get('/api/health', (req, res) => {
+  res.json({ status: "Healthy", message: "BeatBuddy API Server is live! 🎧" });
+});
+
 app.listen(PORT, () => {
-  console.log(`🚀 BeatBuddy Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Industry-grade BeatBuddy Server running on http://localhost:${PORT}`);
 });

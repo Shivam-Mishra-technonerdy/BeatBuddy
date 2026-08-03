@@ -10,3 +10,16 @@ backend/.env
 # 3. System Garbage Files
 .DS_Store
 Thumbs.db
+/generated/prisma
+# Prisma generated client files
+/prisma/client/
+
+# Local database file overrides (if any)
+*.db
+*.db-journal
+# Ignore AI assistant skill caches and documentation folders
+.agents/
+.claude/
+# Ignore local IDE workspace states
+.windsurf/
+skills-lock.json
