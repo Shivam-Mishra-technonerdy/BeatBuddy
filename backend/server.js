@@ -1,9 +1,11 @@
 import express from 'express';
+import cors from 'cors';
 import prisma from './db.js'; // Import our single, secure Prisma instance
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+app.use(cors()); 
 app.use(express.json());
 
 // 1. Fetch All Songs Catalog
